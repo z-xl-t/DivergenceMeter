@@ -5,8 +5,32 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DivergenceMeter"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="MainWindow" MinHeight="460" MinWidth="1400">
 
+    <Grid MinWidth="800" Height="300" Margin="0">
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.Column="0" Name="A" Margin="4,5,0,0">0</TextBlock>
+        <TextBlock Grid.Column="1" Name="B" Margin="4,5,0,0">0</TextBlock>
+        <TextBlock Grid.Column="2" Name="C" Margin="4,5,0,0">0</TextBlock>
+        <TextBlock Grid.Column="3" Name="D" Margin="4,5,0,0">0</TextBlock>
+        <TextBlock Grid.Column="4" Name="E" Margin="4,5,0,0">0</TextBlock>
+        <TextBlock Grid.Column="5" Name="F" Margin="4,5,0,0">0</TextBlock>
+        <TextBlock Grid.Column="6" Name="G" Margin="4,5,0,0">0</TextBlock>
+        <TextBlock Grid.Column="7" Name="H" Margin="4,5,0,0">0</TextBlock>
+        <Image Grid.Column="8"  Source="images/0.png" Width="100"></Image>
     </Grid>
+
 </Window>

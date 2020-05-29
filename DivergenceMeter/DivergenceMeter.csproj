@@ -6,4 +6,19 @@
         <UseWPF>true</UseWPF>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Folder Include="images" />
+        <Resource Include="images/0.png" />
+        <Resource Include="images/1.png" />
+        <Resource Include="images/2.png" />
+        <Resource Include="images/3.png" />
+        <Resource Include="images/4.png" />
+        <Resource Include="images/5.png" />
+        <Resource Include="images/6.png" />
+        <Resource Include="images/7.png" />
+        <Resource Include="images/8.png" />
+        <Resource Include="images/9.png" />
+        <Resource Include="images/10.png" />
+        <Resource Include="images/11.png" />
+    </ItemGroup>
 </Project>
