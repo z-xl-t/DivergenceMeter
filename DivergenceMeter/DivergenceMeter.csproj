@@ -7,7 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="images" />
         <Resource Include="images/0.png" />
         <Resource Include="images/1.png" />
         <Resource Include="images/2.png" />
@@ -20,5 +19,11 @@
         <Resource Include="images/9.png" />
         <Resource Include="images/10.png" />
         <Resource Include="images/11.png" />
+        <Resource Include="images/12.png" />
+        <Resource Include="images/favicon.ico" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.0.8" />
     </ItemGroup>
 </Project>
