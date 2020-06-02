@@ -40,6 +40,7 @@ namespace DivergenceMeter
         #region 窗体拖动事件
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            
             this.DragMove();
         }
         #endregion

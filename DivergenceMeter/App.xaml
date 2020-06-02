@@ -6,9 +6,11 @@
              StartupUri="MainWindow.xaml" ShutdownMode="OnExplicitShutdown">
     <Application.Resources>
         <ContextMenu x:Key="Menu">
-            <MenuItem Header="全部设置" />
-            <Separator />
-            <MenuItem Header="退出" Click="ClickToExit" />
+            <MenuItem Header = "打开设置"/>
+            <MenuItem Header = "点击穿透"/>
+            <MenuItem Header = "边缘吸附"/>
+            <MenuItem Header = "允许拖动"/>
+            <MenuItem Header = "桌面固定"/>
         </ContextMenu>
         <!-- 系统托盘 使用第三方包 -->
         <tb:TaskbarIcon x:Key="Taskbar"
