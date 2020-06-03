@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -13,26 +15,46 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using DivergenceMeter.Annotations;
+
 namespace DivergenceMeter
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    
-    public partial class MainWindow : Window
+
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        private int WindowsInitWidth = 1440;
-        private int windowsInitHeight = 460;
+        private double WindowsInitWidth = 1440;
+        private double WindowsInitHeight = 460;
+        private double WindowInitLeft = 280;
+        private double WindowInitTop = 80;
         private double scale = 0.2;
         private DateTime _nowTime;
         private DispatcherTimer _meterClock;
         private List<BitmapImage> AllImages = new List<BitmapImage>();
+
+        /// <summary>
+        /// OpacityValue 被 gird 实例绑定
+        /// </summary>
+        private double _opacityValue = 0.5;
+        public double OpacityValue
+        {
+            get => _opacityValue;
+            set
+            {
+                _opacityValue = value;
+                OnPropertyChanged(nameof(OpacityValue));
+            } 
+        }
         #region 主函数
         public MainWindow()
         {
             InitializeComponent();
             this.Width = WindowsInitWidth * scale;
-            this.Height = windowsInitHeight * scale;
+            this.Height = WindowsInitHeight * scale;
+            this.Left = WindowInitLeft;
+            this.Top = WindowInitTop;
             LoadAllImage(ref AllImages);
             StartClock();
         }
@@ -99,11 +121,23 @@ namespace DivergenceMeter
                 bi.EndInit();
                 images.Add(bi); 
             }
-
-            
         }
-
         #endregion
-        
+
+        #region 数据绑定回显
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+        #endregion
+
+        // 测试代码
+        //private void Button_Click(object sender, RoutedEventArgs e)
+        //{
+        //    this.OpacityValue = 0.5;
+        //}
     }
 }

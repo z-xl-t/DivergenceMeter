@@ -11,6 +11,7 @@
             <MenuItem Header = "边缘吸附"/>
             <MenuItem Header = "允许拖动"/>
             <MenuItem Header = "桌面固定"/>
+            <MenuItem Header = "退出应用" Click="ClickToExit"/>
         </ContextMenu>
         <!-- 系统托盘 使用第三方包 -->
         <tb:TaskbarIcon x:Key="Taskbar"
