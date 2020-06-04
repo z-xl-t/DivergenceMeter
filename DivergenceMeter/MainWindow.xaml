@@ -10,11 +10,9 @@
         WindowStyle="None" 
         ResizeMode="NoResize" 
         AllowsTransparency="True"  
-        Background="Transparent" 
+        Background="Transparent"
         MouseLeftButtonDown="Window_MouseLeftButtonDown"
-        ShowInTaskbar="False"
-        IsHitTestVisible="False"
->
+        ShowInTaskbar="False">
     <!--
     AllowsTransparency="True"  Background="Transparent"  配合使窗体能够透明 
     -->
@@ -24,6 +22,8 @@
     <!--
         IsHitTestVisible="False" 点击穿透效果， 
         可是在 .net core 3.1 中 能穿透，但不能点击下面的桌面图标
+        在 netcore/wpf 提 ISSUSE， 后经过搜索得到一种解决方案
+        https://github.com/dotnet/wpf/issues/3088
      -->
     <!-- Binding CLR properties the OpacityValue -->
     <Grid Margin="0" Opacity="{Binding OpacityValue, ElementName=Window}">
@@ -39,16 +39,15 @@
             <ColumnDefinition Width="*"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
-            <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <Image Grid.Column="0" IsHitTestVisible="False"  Name="A" Source="images/10.png" Stretch="Fill" ></Image>
-        <Image Grid.Column="1" IsHitTestVisible="False" Name="B" Source="images/10.png" Stretch="Fill" ></Image>
-        <Image Grid.Column="2" IsHitTestVisible="False" Name="C" Source="images/10.png" Stretch="Fill" ></Image>
-        <Image Grid.Column="3" IsHitTestVisible="False" Name="D" Source="images/10.png" Stretch="Fill" ></Image>
-        <Image Grid.Column="4" IsHitTestVisible="False" Name="E" Source="images/10.png" Stretch="Fill" ></Image>
-        <Image Grid.Column="5" IsHitTestVisible="False" Name="F" Source="images/10.png" Stretch="Fill" ></Image>
-        <Image Grid.Column="6" IsHitTestVisible="False" Name="G" Source="images/10.png" Stretch="Fill" ></Image>
-        <Image Grid.Column="7" IsHitTestVisible="False" Name="H" Source="images/10.png" Stretch="Fill" ></Image>
+        <Image Grid.Column="0" Name="A" Source="Images/10.png" Stretch="Fill"></Image>
+        <Image Grid.Column="1" Name="B" Source="Images/10.png" Stretch="Fill"></Image>
+        <Image Grid.Column="2" Name="C" Source="Images/10.png" Stretch="Fill"></Image>
+        <Image Grid.Column="3" Name="D" Source="Images/10.png" Stretch="Fill"></Image>
+        <Image Grid.Column="4" Name="E" Source="Images/10.png" Stretch="Fill"></Image>
+        <Image Grid.Column="5" Name="F" Source="Images/10.png" Stretch="Fill"></Image>
+        <Image Grid.Column="6" Name="G" Source="Images/10.png" Stretch="Fill"></Image>
+        <Image Grid.Column="7" Name="H" Source="Images/10.png" Stretch="Fill"></Image>
         
         <!-- 测试 透明度 的代码
         <Button Grid.Column="8"  Content="不错" Click="Button_Click"/>

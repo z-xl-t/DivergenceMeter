@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -16,7 +17,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using DivergenceMeter.Annotations;
-
+using System.Windows.Interop;
 namespace DivergenceMeter
 {
     /// <summary>
@@ -33,7 +34,6 @@ namespace DivergenceMeter
         private DateTime _nowTime;
         private DispatcherTimer _meterClock;
         private List<BitmapImage> AllImages = new List<BitmapImage>();
-
         /// <summary>
         /// OpacityValue 被 gird 实例绑定
         /// </summary>
@@ -50,6 +50,7 @@ namespace DivergenceMeter
         #region 主函数
         public MainWindow()
         {
+            
             InitializeComponent();
             this.Width = WindowsInitWidth * scale;
             this.Height = WindowsInitHeight * scale;
@@ -57,6 +58,17 @@ namespace DivergenceMeter
             this.Top = WindowInitTop;
             LoadAllImage(ref AllImages);
             StartClock();
+        }
+        #endregion
+        #region 重写 OnSourceInitialized 函数
+        /// <summary>
+        /// 只有在 OnSourceInitialized 函数触发之后，才能获取到 Windows 句柄
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+            ClickWindowAndNotMouseEvent();
         }
         #endregion
         #region 窗体拖动事件
@@ -123,7 +135,6 @@ namespace DivergenceMeter
             }
         }
         #endregion
-
         #region 数据绑定回显
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -133,7 +144,27 @@ namespace DivergenceMeter
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
         #endregion
+        #region 点击穿透功能
+        public const int WS_EX_TRANSPARENT = 0x00000020;
+        public const int GWL_EXSTYLE = -20;
 
+        [DllImport("user32.dll")]
+        public static extern int GetWindowLong(IntPtr hwnd, int index);
+
+        [DllImport("user32.dll")]
+        public static extern int SetWindowLong(IntPtr hwnd, int index, int newStyle);
+        public void ClickWindowAndNotMouseEvent()
+        {
+            // Get this window's handle
+            IntPtr hwnd = new WindowInteropHelper(this).Handle;
+
+            // Change the extended window style to include WS_EX_TRANSPARENT
+            int extendedStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+
+            SetWindowLong(hwnd, GWL_EXSTYLE, WS_EX_TRANSPARENT);
+
+        }
+        #endregion
         // 测试代码
         //private void Button_Click(object sender, RoutedEventArgs e)
         //{
