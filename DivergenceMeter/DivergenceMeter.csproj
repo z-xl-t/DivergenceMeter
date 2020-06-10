@@ -4,10 +4,23 @@
         <OutputType>WinExe</OutputType>
         <TargetFramework>netcoreapp3.1</TargetFramework>
         <UseWPF>true</UseWPF>
+        <PackageLicenseFile>License.txt</PackageLicenseFile>
+        <Copyright>椎咲良田</Copyright>
+        <PackageIcon></PackageIcon>
+        <Authors>椎咲良田</Authors>
+        <Company>非实质性红茶</Company>
+        <Description></Description>
+        <StartupObject></StartupObject>
+        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+      <WarningLevel>2</WarningLevel>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.0.8" />
+      <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     </ItemGroup>
 
     <ItemGroup>
@@ -24,6 +37,6 @@
         <Resource Include="Images\10.png" />
         <Resource Include="Images\11.png" />
         <Resource Include="Images\12.png" />
-        <Resource Include="Images\favicon.ico" />
+	    <Resource Include="Images\favicon.ico" />
     </ItemGroup>
 </Project>
