@@ -45,7 +45,7 @@
                         <MenuItem x:Name="item_a_xaml" Header = "开机自启" Click="StartUpInWindow"/>
                         <MenuItem x:Name="item_b_xaml" Header = "点击穿透" Click="ClickThrough"/>
                         <MenuItem x:Name="item_c_xaml" Header = "边缘吸附" Click="EdgeAttach"/>
-                        <MenuItem x:Name="item_d_xaml" Header = "允许拖动" Click="DragMove"/>
+                        <MenuItem x:Name="item_d_xaml" Header = "允许拖动" Click="AllowDragMove"/>
                         <MenuItem x:Name="item_e_xaml" Header = "总在顶层" Click="AlwaysInTop"/>
                         <MenuItem x:Name="item_f_xaml" Header = "不透明度" Click="ChangeOpacity">
                             <MenuItem Header="10%" Opacity="0.1"></MenuItem>

@@ -18,6 +18,7 @@ namespace DivergenceMeter
     /// </summary>
     public partial class MainWindow : Window
     {
+        private String _settingPath;
         private DateTime _nowTime;
         private DispatcherTimer _meterClock;
         private DispatcherTimer _worldLineChangeClock;
@@ -44,6 +45,7 @@ namespace DivergenceMeter
         /// </summary>
         protected override void OnSourceInitialized(EventArgs e)
         {
+            _settingPath = AppDomain.CurrentDomain.BaseDirectory + "setting.json";
             MainSetting = InitSetting();
             SettingWindowStatus(MainSetting);
             AllImages = LoadAllImage();
@@ -67,11 +69,9 @@ namespace DivergenceMeter
         {
             
             Setting setting;
-            String settingPath = AppDomain.CurrentDomain.BaseDirectory + "setting.json";
-            // MessageBox.Show(settingPath);
-            if (File.Exists(@$"{settingPath}"))
+            if (File.Exists(@$"{_settingPath}"))
             {
-                Setting.LoadSetting(@$"{settingPath}", out setting);
+                Setting.LoadSetting(@$"{_settingPath}", out setting);
             }
             else
             {
@@ -273,6 +273,8 @@ namespace DivergenceMeter
             StartWhenSystemStart(MainSetting.StartUpStatus);
             MenuItem item = sender as MenuItem;
             item.IsChecked = MainSetting.StartUpStatus;
+
+            Setting.SaveSetting(@$"{_settingPath}", MainSetting);
         }
         private void ClickThrough(object sender, RoutedEventArgs e)
         {
@@ -287,14 +289,47 @@ namespace DivergenceMeter
                 MainSetting.DragMoveStatus = false;
                 item_d_xaml.IsChecked = false;
             }
+
+            Setting.SaveSetting(@$"{_settingPath}", MainSetting);
         }
         private void EdgeAttach(object sender, RoutedEventArgs e)
         {
             MainSetting.EdgeAttachStatus = !MainSetting.EdgeAttachStatus;
             MenuItem item = sender as MenuItem;
             item.IsChecked = MainSetting.EdgeAttachStatus;
+
+            
+            // 当开启边缘吸附时，立刻检测当前位置，选择合适的地方停靠
+            if (MainSetting.EdgeAttachStatus == true)
+            {
+                int step = 10;
+                var a = MainSetting.Left - 0;
+                var b = MainSetting.Top - 0;
+                var c = _workAreaWidth - MainSetting.Left - MainSetting.Width;
+                var d = _workAreaHeight - MainSetting.Top - MainSetting.Height ;
+                if (a < step)
+                {
+                    this.Left = 0;
+                    MainSetting.Left = 0;
+                }
+                if (b < step)
+                {
+                    this.Top = 0;
+                    MainSetting.Top = 0;
+                }
+                if (c < step)
+                {
+                    this.Left = _workAreaWidth - this.Width;
+                }
+                if (d < step)
+                {
+                    this.Top = _workAreaHeight - this.Height;
+                }
+            }
+
+            Setting.SaveSetting(@$"{_settingPath}", MainSetting);
         }
-        private void DragMove(object sender, RoutedEventArgs e)
+        private void AllowDragMove(object sender, RoutedEventArgs e)
         {
             MainSetting.DragMoveStatus = !MainSetting.DragMoveStatus;
             MenuItem item = sender as MenuItem;
@@ -304,7 +339,9 @@ namespace DivergenceMeter
                 MainSetting.ClickThroughStatus = false;
                 item_b_xaml.IsChecked = false;
                 ClickWindowAndNotMouseEvent(MainSetting.ClickThroughStatus);
-            } 
+            }
+
+            Setting.SaveSetting(@$"{_settingPath}", MainSetting);
         }
         private void AlwaysInTop(object sender, RoutedEventArgs e)
         {
@@ -312,6 +349,8 @@ namespace DivergenceMeter
             WindowAwaysTopOrDesktop(MainSetting.AlwaysInTopStatus);
             MenuItem item = sender as MenuItem;
             item.IsChecked = MainSetting.AlwaysInTopStatus;
+
+            Setting.SaveSetting(@$"{_settingPath}", MainSetting);
         }
         private void ChangeOpacity(object sender, RoutedEventArgs e)
         {
@@ -324,12 +363,14 @@ namespace DivergenceMeter
             selectedItem.IsChecked = !selectedItem.IsChecked;
             MainSetting.Opacity = double.Parse(selectedItem.Opacity.ToString());
             TheGridXaml.Opacity = MainSetting.Opacity;
+
+            Setting.SaveSetting(@$"{_settingPath}", MainSetting);
         }
         // 退出应用
         // 配合 app.xaml 中 ShutdownMode 属性使用
         private void ClickToExit(object sender, RoutedEventArgs e)
         {
-            Setting.SaveSetting("setting.json", MainSetting);
+            Setting.SaveSetting(@$"{_settingPath}", MainSetting);
             Application.Current.Shutdown();
         }
         #endregion

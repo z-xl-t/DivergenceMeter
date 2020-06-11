@@ -4,18 +4,23 @@
         <OutputType>WinExe</OutputType>
         <TargetFramework>netcoreapp3.1</TargetFramework>
         <UseWPF>true</UseWPF>
-        <PackageLicenseFile>License.txt</PackageLicenseFile>
-        <Copyright>椎咲良田</Copyright>
-        <PackageIcon></PackageIcon>
-        <Authors>椎咲良田</Authors>
-        <Company>非实质性红茶</Company>
+        <PackageLicenseFile>License</PackageLicenseFile>
+        <Copyright>zxlt</Copyright>
+        <PackageIcon>Icons.png</PackageIcon>
+        <Authors>zxlt</Authors>
+        <Company>sanshiliuxiao</Company>
         <Description></Description>
         <StartupObject></StartupObject>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+        <RepositoryUrl>https://github.com/sanshiliuxiao/DivergenceMeter</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/sanshiliuxiao/DivergenceMeter</PackageProjectUrl>
+        <PackageTags>DivergenceMeter</PackageTags>
+        <ApplicationIcon>favicon.ico</ApplicationIcon>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
       <WarningLevel>2</WarningLevel>
+      <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>
@@ -38,5 +43,16 @@
         <Resource Include="Images\11.png" />
         <Resource Include="Images\12.png" />
 	    <Resource Include="Images\favicon.ico" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="..\License">
+        <Pack>True</Pack>
+        <PackagePath></PackagePath>
+      </None>
+      <None Include="Icons.png">
+        <Pack>True</Pack>
+        <PackagePath></PackagePath>
+      </None>
     </ItemGroup>
 </Project>
