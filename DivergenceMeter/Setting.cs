@@ -39,7 +39,7 @@ namespace DivergenceMeter
             Opacity = 1.0;
             StartUpStatus = false;
             ClickThroughStatus = false;
-            EdgeAttachStatus = false;
+            EdgeAttachStatus = true;
             DragMoveStatus = true;
             AlwaysInTopStatus = true;
         }

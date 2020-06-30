@@ -15,7 +15,6 @@
 ### 实现功能
 
 - [x] 开机自启
-
 - [x] 点击穿透
 - [x] 拖动允许
 - [x] 边缘吸附
@@ -23,14 +22,13 @@
 - [x] 透明度设置
 - [x] 世界线变动效果（鼠标右击）
 
-- [ ] 程序打包（咕了）
-- [ ] MVVM 模式驱动（咕了）
-
 ### 使用说明
 
-0. download zip or git clone in  The [Github.com](https://github.com/sanshiliuxiao/DivergenceMeter) or [Gitee.com](https://gitee.com/sanshiliuxiao/DivergenceMeter)
+0.    直接从 exe 文件夹中下载安装，即可食用。如果想查看并修改源代码，执行下一步。
 
-1. 如果你使用 `dotnet cli` ，请在 powershell 下 输入如下命令:
+1. 从 [Github.com](https://github.com/sanshiliuxiao/DivergenceMeter) 或者 [Gitee.com](https://gitee.com/sanshiliuxiao/DivergenceMeter) 下载源代码
+
+2. 如果你使用 `dotnet cli` ，请在 `shell` 下 输入如下命令:
 
    ```powershell
    // cmd or powershell or git bash etc
@@ -40,7 +38,8 @@
    dotnet run --project DivergenceMeter
    ```
 
-2. 如果你使用 `vistual studio 2019`，点击 `DivergenceMeter.sln` 解决方案，等待自动恢复项目的依赖项和工具 ，最后调试项目或者生成应用。
+3. 如果你使用 `vistual studio 2019`，点击 `DivergenceMeter.sln` 解决方案，等待自动恢复项目的依赖项和工具 ，最后调试项目或者发布应用。
+
 
 ### 项目说明 
 

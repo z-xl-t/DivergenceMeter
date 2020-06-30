@@ -6,15 +6,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DivergenceMeter"
         mc:Ignorable="d"
-        Title="MainWindow"
+        Title="DivergenceMeter"
         x:Name="TheWindowXaml"
-        WindowStyle="None" 
+        WindowStyle="None"
         ResizeMode="NoResize" 
         AllowsTransparency="True"  
         Background="Transparent"
         MouseLeftButtonDown="Window_MouseLeftButtonDown"
-        ShowInTaskbar="False"
-        >
+        Opacity="0"
+        ShowInTaskbar="False">
     <Window.Resources>
  
     </Window.Resources>

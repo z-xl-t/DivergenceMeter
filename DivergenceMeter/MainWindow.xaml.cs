@@ -18,10 +18,13 @@ namespace DivergenceMeter
     /// </summary>
     public partial class MainWindow : Window
     {
+        #region 私有变量
         private String _settingPath;
         private DateTime _nowTime;
         private DispatcherTimer _meterClock;
         private DispatcherTimer _worldLineChangeClock;
+        private DispatcherTimer _loadTheApp;
+        private DispatcherTimer _exitTheApp;
         private const int _minChangeCount = 50;
         private int _currentChangeCount = 0;
         private int _lastHeaderStatus = int.MaxValue;
@@ -30,9 +33,74 @@ namespace DivergenceMeter
         private double _workAreaHeight = SystemParameters.WorkArea.Height;
         private double _desktopWidth = SystemParameters.PrimaryScreenWidth;
         private double _desktopHeight = SystemParameters.PrimaryScreenHeight;
-        public Setting MainSetting { get; set; }
+        private Setting MainSetting { get; set; }
         // 存放所有图片
-        public BitmapImage[] AllImages { get; set; } = new BitmapImage[13];
+        private BitmapImage[] AllImages { get; set; } = new BitmapImage[13];
+        #endregion
+        #region Window styles
+        [DllImport("user32.dll")]
+        public static extern int GetWindowLong(IntPtr hwnd, int index);
+
+        [Flags]
+        public enum ExtendedWindowStyles
+        {
+            WS_EX_TOOLWINDOW = 0x00000080,
+            WS_EX_LAYERED = 0x80000,
+            WS_EX_TRANSPARENT = 0x00000020
+        }
+        [Flags]
+        public enum GetWindowLongFields
+        {
+            GWL_EXSTYLE = (-20),
+        }
+        [DllImport("user32.dll")]
+        public static extern int SetWindowLong(IntPtr hwnd, int index, int newStyle);
+
+
+        public static IntPtr SetWindowLong(IntPtr hWnd, int nIndex, IntPtr dwNewLong)
+        {
+            int error = 0;
+            IntPtr result = IntPtr.Zero;
+            // Win32 SetWindowLong doesn't clear error on success
+            SetLastError(0);
+
+            if (IntPtr.Size == 4)
+            {
+                // use SetWindowLong
+                Int32 tempResult = IntSetWindowLong(hWnd, nIndex, IntPtrToInt32(dwNewLong));
+                error = Marshal.GetLastWin32Error();
+                result = new IntPtr(tempResult);
+            }
+            else
+            {
+                // use SetWindowLongPtr
+                result = IntSetWindowLongPtr(hWnd, nIndex, dwNewLong);
+                error = Marshal.GetLastWin32Error();
+            }
+
+            if ((result == IntPtr.Zero) && (error != 0))
+            {
+                throw new System.ComponentModel.Win32Exception(error);
+            }
+
+            return result;
+        }
+
+        [DllImport("user32.dll", EntryPoint = "SetWindowLongPtr", SetLastError = true)]
+        private static extern IntPtr IntSetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
+
+        [DllImport("user32.dll", EntryPoint = "SetWindowLong", SetLastError = true)]
+        private static extern Int32 IntSetWindowLong(IntPtr hWnd, int nIndex, Int32 dwNewLong);
+
+        private static int IntPtrToInt32(IntPtr intPtr)
+        {
+            return unchecked((int)intPtr.ToInt64());
+        }
+
+        [DllImport("kernel32.dll", EntryPoint = "SetLastError")]
+        public static extern void SetLastError(int dwErrorCode);
+        #endregion
+
         #region 主函数
         public MainWindow()
         {
@@ -53,15 +121,41 @@ namespace DivergenceMeter
             StartWhenSystemStart(MainSetting.StartUpStatus);
             ClickWindowAndNotMouseEvent(MainSetting.ClickThroughStatus);
             WindowAwaysTopOrDesktop(MainSetting.AlwaysInTopStatus);
-
+            (bool f, double left, double top) values =CheckPositonInEdge(MainSetting.EdgeAttachStatus, MainSetting.Left, MainSetting.Top, MainSetting.Width, MainSetting.Height);
+            if (values.f)
+            {
+                this.Left = values.left;
+                this.Top = values.top;
+                MainSetting.Left = this.Left;
+                MainSetting.Top = this.Top;
+                Setting.SaveSetting($@"{_settingPath}", MainSetting);
+            }
+           
             _meterClock = new DispatcherTimer();
             _meterClock.Tick += new EventHandler(TheClock);
             _meterClock.Interval = new TimeSpan(0, 0, 0, 0, 100);
-            _meterClock.Start();
 
             _worldLineChangeClock = new DispatcherTimer();
             _worldLineChangeClock.Tick += new EventHandler(TheWorldLineChange);
-            _worldLineChangeClock.Interval = new TimeSpan(0, 0, 0, 0, 30); 
+            _worldLineChangeClock.Interval = new TimeSpan(0, 0, 0, 0, 30);
+            _worldLineChangeClock.Start();
+
+            _exitTheApp = new DispatcherTimer();
+            _exitTheApp.Tick += new EventHandler(ExitTHeApp);
+            _exitTheApp.Interval = new TimeSpan(0, 0, 0, 0, 60);
+
+
+            _loadTheApp = new DispatcherTimer();
+            _loadTheApp.Tick += new EventHandler(StartTheApp);
+            _loadTheApp.Interval = new TimeSpan(0, 0, 0, 0, 60);
+            _loadTheApp.Start();
+
+            WindowInteropHelper wndHelper = new WindowInteropHelper(this);
+            int exStyle = (int)GetWindowLong(wndHelper.Handle, (int)GetWindowLongFields.GWL_EXSTYLE);
+            exStyle = exStyle | (int)ExtendedWindowStyles.WS_EX_TOOLWINDOW;
+            SetWindowLong(wndHelper.Handle, (int)GetWindowLongFields.GWL_EXSTYLE, (IntPtr)exStyle);
+
+
         }
         #endregion
         #region 从配置文件中获取以保存的设置
@@ -69,9 +163,9 @@ namespace DivergenceMeter
         {
             
             Setting setting;
-            if (File.Exists(@$"{_settingPath}"))
+            if (File.Exists($@"{_settingPath}"))
             {
-                Setting.LoadSetting(@$"{_settingPath}", out setting);
+                Setting.LoadSetting($@"{_settingPath}", out setting);
             }
             else
             {
@@ -169,7 +263,7 @@ namespace DivergenceMeter
 
             for (int i = 0; i < images.Length; i++)
             {
-                String imagePath = @$"/images/{i}.png";
+                String imagePath = $@"/images/{i}.png";
                 BitmapImage bi = new BitmapImage();
                 bi.BeginInit();
                 bi.UriSource = new Uri(imagePath, UriKind.RelativeOrAbsolute);
@@ -208,54 +302,60 @@ namespace DivergenceMeter
             if (MainSetting.DragMoveStatus)
             {
                 DragMove();
-                if (MainSetting.EdgeAttachStatus)
+                (bool f, double left, double top) values = CheckPositonInEdge(MainSetting.EdgeAttachStatus, this.Left, this.Top, this.Width, this.Height);
+                if (values.f)
                 {
-                    
-                    int step = 10;
-                    if (this.Left < step)
-                    {
-                        this.Left = 0;
-                    }
-                    if (this.Top < step)
-                    {
-                        this.Top = 0;
-                    }
-                    if (this.Left + this.Width + step > _workAreaWidth)
-                    {
-                        this.Left = _workAreaWidth - this.Width;
-                    }
-                    if (this.Top + this.Height + step > _workAreaHeight)
-                    {
-                        this.Top = _workAreaHeight - this.Height;
-                    }
-
+                    this.Left = values.left;
+                    this.Top = values.top;
                 }
-                // 更新坐标
                 MainSetting.Left = this.Left;
                 MainSetting.Top = this.Top;
+
             }
         }
         #endregion
-        #region 点击穿透功能
-        [DllImport("user32.dll")]
-        public static extern int GetWindowLong(IntPtr hwnd, int index);
+        #region 判断是否能边缘吸附并设置其坐标
+        public (bool,double,double) CheckPositonInEdge(bool flag, double left, double top,double width, double height)
+        {
+            bool f = false;
+            if (flag)
+            {
+                if (left < 0)
+                {
+                    left = 0;
+                    f = true;
+                }
+                if (top < 0)
+                {
+                    top = 0;
+                    f = true;
+                }
+                if (left + width > _workAreaWidth)
+                {
+                    left = _workAreaWidth - width;
+                    f = true;
+                }
+                if (top + height > _workAreaHeight)
+                {
+                    top = _workAreaHeight - height;
+                    f = true;
+                }
+            }
+            return (f, left, top);
 
-        [DllImport("user32.dll")]
-        public static extern int SetWindowLong(IntPtr hwnd, int index, int newStyle);
+        }
+        #endregion
+        #region 点击穿透功能
         public void ClickWindowAndNotMouseEvent(bool flag)
         {
-            int WS_EX_TRANSPARENT = 0x00000020;
-            int WS_EX_LAYERED = 0x80000;
-            int GWL_EXSTYLE = -20;
-
             // Get this window's handle
             IntPtr hwnd = new WindowInteropHelper(this).Handle;
             if (flag)
             {
-               SetWindowLong(hwnd, GWL_EXSTYLE, WS_EX_TRANSPARENT);
+               SetWindowLong(hwnd, (int)GetWindowLongFields.GWL_EXSTYLE, (int)ExtendedWindowStyles.WS_EX_TRANSPARENT);
             } else
             {
-               SetWindowLong(hwnd, GWL_EXSTYLE, WS_EX_LAYERED);
+               SetWindowLong(hwnd, (int)GetWindowLongFields.GWL_EXSTYLE, (int)ExtendedWindowStyles.WS_EX_LAYERED);
             }
 
         }
@@ -274,7 +374,7 @@ namespace DivergenceMeter
             MenuItem item = sender as MenuItem;
             item.IsChecked = MainSetting.StartUpStatus;
 
-            Setting.SaveSetting(@$"{_settingPath}", MainSetting);
+            Setting.SaveSetting($@"{_settingPath}", MainSetting);
         }
         private void ClickThrough(object sender, RoutedEventArgs e)
         {
@@ -290,7 +390,7 @@ namespace DivergenceMeter
                 item_d_xaml.IsChecked = false;
             }
 
-            Setting.SaveSetting(@$"{_settingPath}", MainSetting);
+            Setting.SaveSetting($@"{_settingPath}", MainSetting);
         }
         private void EdgeAttach(object sender, RoutedEventArgs e)
         {
@@ -298,36 +398,16 @@ namespace DivergenceMeter
             MenuItem item = sender as MenuItem;
             item.IsChecked = MainSetting.EdgeAttachStatus;
 
-            
-            // 当开启边缘吸附时，立刻检测当前位置，选择合适的地方停靠
-            if (MainSetting.EdgeAttachStatus == true)
+            (bool f, double left, double top) values = CheckPositonInEdge(MainSetting.EdgeAttachStatus, this.Left, this.Top, this.Width, this.Height);
+            if (values.f)
             {
-                int step = 10;
-                var a = MainSetting.Left - 0;
-                var b = MainSetting.Top - 0;
-                var c = _workAreaWidth - MainSetting.Left - MainSetting.Width;
-                var d = _workAreaHeight - MainSetting.Top - MainSetting.Height ;
-                if (a < step)
-                {
-                    this.Left = 0;
-                    MainSetting.Left = 0;
-                }
-                if (b < step)
-                {
-                    this.Top = 0;
-                    MainSetting.Top = 0;
-                }
-                if (c < step)
-                {
-                    this.Left = _workAreaWidth - this.Width;
-                }
-                if (d < step)
-                {
-                    this.Top = _workAreaHeight - this.Height;
-                }
+                this.Left = values.left;
+                this.Top = values.top;
+                MainSetting.Left = this.Left;
+                MainSetting.Top = this.Top;
             }
 
-            Setting.SaveSetting(@$"{_settingPath}", MainSetting);
+            Setting.SaveSetting($@"{_settingPath}", MainSetting);
         }
         private void AllowDragMove(object sender, RoutedEventArgs e)
         {
@@ -341,7 +421,7 @@ namespace DivergenceMeter
                 ClickWindowAndNotMouseEvent(MainSetting.ClickThroughStatus);
             }
 
-            Setting.SaveSetting(@$"{_settingPath}", MainSetting);
+            Setting.SaveSetting($@"{_settingPath}", MainSetting);
         }
         private void AlwaysInTop(object sender, RoutedEventArgs e)
         {
@@ -350,7 +430,7 @@ namespace DivergenceMeter
             MenuItem item = sender as MenuItem;
             item.IsChecked = MainSetting.AlwaysInTopStatus;
 
-            Setting.SaveSetting(@$"{_settingPath}", MainSetting);
+            Setting.SaveSetting($@"{_settingPath}", MainSetting);
         }
         private void ChangeOpacity(object sender, RoutedEventArgs e)
         {
@@ -364,14 +444,13 @@ namespace DivergenceMeter
             MainSetting.Opacity = double.Parse(selectedItem.Opacity.ToString());
             TheGridXaml.Opacity = MainSetting.Opacity;
 
-            Setting.SaveSetting(@$"{_settingPath}", MainSetting);
+            Setting.SaveSetting($@"{_settingPath}", MainSetting);
         }
         // 退出应用
         // 配合 app.xaml 中 ShutdownMode 属性使用
-        private void ClickToExit(object sender, RoutedEventArgs e)
+        private void ClickToExit(object sender, EventArgs e)
         {
-            Setting.SaveSetting(@$"{_settingPath}", MainSetting);
-            Application.Current.Shutdown();
+            _exitTheApp.Start();
         }
         #endregion
         #region 激发世界线效果
@@ -382,5 +461,34 @@ namespace DivergenceMeter
             _changeWroldStatus = true;
         }
         #endregion
+
+        private void StartTheApp(object sender, EventArgs e)
+        {
+            if (TheWindowXaml.Opacity < 1)
+            {
+
+                TheWindowXaml.Opacity += 0.1;
+            }
+            else
+            {
+                TheWindowXaml.Opacity = 1;
+                _loadTheApp.Stop();
+                
+            }
+        }
+        private void ExitTHeApp(object sender, EventArgs e)
+        {
+            if (TheWindowXaml.Opacity > 0)
+            {
+
+                TheWindowXaml.Opacity -= 0.1;
+            }
+            else
+            {
+                _exitTheApp.Stop();
+                Setting.SaveSetting($@"{_settingPath}", MainSetting);
+                Application.Current.Shutdown();
+            }
+        }
     }
 }
