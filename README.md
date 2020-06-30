@@ -40,6 +40,10 @@
 
 3. 如果你使用 `vistual studio 2019`，点击 `DivergenceMeter.sln` 解决方案，等待自动恢复项目的依赖项和工具 ，最后调试项目或者发布应用。
 
+4. 理论上是可以生成 基于 `.net framework`  应用，只需要将  `TargetFramework` 属性设置成对应的版本。参考：[SDK 样式项目中的目标框架](https://docs.microsoft.com/zh-cn/dotnet/standard/frameworks)
+
+5. 使用 [Inno Setup](https://jrsoftware.org/isdl.php) 进行打包，分别打包为 `net472` 和 `netcore31` 的应用，需要计算机自带 `net framework 4.7.2` 或 `.net core 3.1` 的运行环境
+
 
 ### 项目说明 
 

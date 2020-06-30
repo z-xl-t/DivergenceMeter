@@ -448,7 +448,7 @@ namespace DivergenceMeter
         }
         // 退出应用
         // 配合 app.xaml 中 ShutdownMode 属性使用
-        private void ClickToExit(object sender, EventArgs e)
+        private void ClickToExit(object sender, RoutedEventArgs e)
         {
             _exitTheApp.Start();
         }
