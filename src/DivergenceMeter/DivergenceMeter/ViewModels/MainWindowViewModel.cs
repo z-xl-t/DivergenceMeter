@@ -37,7 +37,9 @@ namespace DivergenceMeter.ViewModels
 
         public MainWindowViewModel()
         {
-            Settings = new Settings();
+            Settings = new Settings() { Opacity = 0.5, CanTopmost = true , CanDragMove = true};
+
+
             IninialClockImages();
 
             DragMoveCommand = new DelegateCommand<object>(DragMove);
@@ -86,7 +88,7 @@ namespace DivergenceMeter.ViewModels
         private void DragMove(object obj)
         {
             var e = obj as MouseButtonEventArgs;
-            if (e != null && e.LeftButton == MouseButtonState.Pressed)
+            if (e != null && e.LeftButton == MouseButtonState.Pressed && Settings.CanDragMove)
             {
                 _mainWindow.DragMove(); 
             }

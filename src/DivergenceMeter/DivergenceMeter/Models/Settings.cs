@@ -21,11 +21,29 @@ namespace DivergenceMeter.Models
             get => _height;
             set => SetProperty(ref _height, value);
         }
+
+        private double _opacity;
+        public double Opacity
+        {
+            get => _opacity;
+            set => SetProperty(ref _opacity, value);
+        }
+        private bool _canTopmost;
+        public bool CanTopmost
+        {
+            get => _canTopmost;
+            set => SetProperty(ref _canTopmost, value);
+        }
+        // 无需与 xmal 元素关联
+        public bool CanDragMove { get; set; }
         public Settings()
         {
             // 八张图片，一张图片宽高比为 1：3，最终为 8：3
             Width = 800;
             Height = 300;
+            Opacity = 1;
+            CanTopmost = false;
+            CanDragMove = true;
         }
     }
 }

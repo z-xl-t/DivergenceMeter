@@ -11,13 +11,16 @@
         WindowStartupLocation="CenterScreen"
         WindowStyle="None"
         ResizeMode="NoResize"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Topmost="{Binding Settings.CanTopmost}"
         Title="MainWindow" Height="{Binding Settings.Height}" Width="{Binding Settings.Width}">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="MouseDown">
             <prism:InvokeCommandAction Command="{Binding DragMoveCommand}" TriggerParameterPath=""></prism:InvokeCommandAction>
         </i:EventTrigger>
     </i:Interaction.Triggers>
-    <Grid>
+    <Grid Background="#000000" Opacity="{Binding Settings.Opacity}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
