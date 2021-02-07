@@ -4,11 +4,19 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DivergenceMeter"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:prism="http://prismlibrary.com/"
         prism:ViewModelLocator.AutoWireViewModel="True"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
-        Title="MainWindow" Height="450" Width="800">
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        Title="MainWindow" Height="{Binding Settings.Height}" Width="{Binding Settings.Width}">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="MouseDown">
+            <prism:InvokeCommandAction Command="{Binding DragMoveCommand}" TriggerParameterPath=""></prism:InvokeCommandAction>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
