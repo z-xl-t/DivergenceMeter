@@ -32,6 +32,9 @@ namespace DivergenceMeter.ViewModels
         public ObservableCollection<BitmapImage> ClockImages { get; set; } = new ObservableCollection<BitmapImage>();
         private int[] _clockImagesIndex = new int[8];
         private Timer _clockTimer;
+        private Timer _worldLineTimer;
+        private int _maxWorldLineChangedCount = 50;
+        private int _currentWorldLineChangedCount;
         // DelegateCommand
         public DelegateCommand<object> DragMoveCommand { get; set; }
 
@@ -39,15 +42,87 @@ namespace DivergenceMeter.ViewModels
         {
             Settings = new Settings() { Opacity = 0.5, CanTopmost = true , CanDragMove = true};
 
-
             IninialClockImages();
 
             DragMoveCommand = new DelegateCommand<object>(DragMove);
+
+
+            var task = new Action(async () =>
+            {
+                // 时钟效果
+                InitialClockTimer();
+
+                // 世界线效果
+                InitialWorldLineTimer();
+
+                StartWorldLineTimer();
+                await Task.Delay(1000);
+                StartClockTimer();
+            });
+            task.Invoke();
+
+        }
+        #region 
+        private void StartWorldLineTimer()
+        {
+            _worldLineTimer?.Start();
+        }
+        private void StopWorldLineTimer()
+        {
+            _worldLineTimer?.Stop();
+        }
+        private void TheWorldLine(object sender, ElapsedEventArgs e)
+        {
+            if (_currentWorldLineChangedCount > _maxWorldLineChangedCount && (_clockImagesIndex[0] == 0 || _clockImagesIndex[0] == 1))
+            {
+                // stop and reset
+                StopWorldLineTimer();
+                _currentWorldLineChangedCount = 0;
+                return;
+
+            }
+
+            _currentWorldLineChangedCount++;
+            Random rd = new Random();
+            _clockImagesIndex[0] = rd.Next(0, 9);
+            _clockImagesIndex[1] = 11; // 不变
+            _clockImagesIndex[2] = rd.Next(0, 9);
+            _clockImagesIndex[3] = rd.Next(0, 9);
+            _clockImagesIndex[4] = rd.Next(0, 9);
+            _clockImagesIndex[5] = rd.Next(0, 9);
+            _clockImagesIndex[6] = rd.Next(0, 9);
+            _clockImagesIndex[7] = rd.Next(0, 9);
+
+            for(var i=0; i<_clockImagesIndex.Length; ++i)
+            {
+                ClockImages[i] = _allImages[_clockImagesIndex[i]];
+            }
+        }
+
+        private void InitialWorldLineTimer()
+        {
+
+            _worldLineTimer = new Timer();
+            _worldLineTimer.Interval = 20;
+            _worldLineTimer.Elapsed += TheWorldLine;
+        }
+        #endregion
+
+        #region 动态时钟
+        private void InitialClockTimer()
+        {
             _clockTimer = new Timer();//  System.Timers
             _clockTimer.Interval = 100; // 毫秒
             _clockTimer.Elapsed += TheClock;
-            _clockTimer.Start();
+        }
+        private void StartClockTimer()
+        {
+            _clockTimer?.Start();
 
+        }
+        private void StopClockTimer()
+        {
+            _clockTimer?.Stop();
         }
 
         private void TheClock(object sender, ElapsedEventArgs e)
@@ -72,7 +147,7 @@ namespace DivergenceMeter.ViewModels
                 ClockImages[i] = _allImages[_clockImagesIndex[i]];
             }
         }
-
+        #endregion
         private void IninialClockImages()
         {
             _allImages = LoadAllImage();
@@ -85,12 +160,22 @@ namespace DivergenceMeter.ViewModels
             ClockImages.AddRange(clockImages);
         }
 
-        private void DragMove(object obj)
+        private async void DragMove(object obj)
         {
             var e = obj as MouseButtonEventArgs;
             if (e != null && e.LeftButton == MouseButtonState.Pressed && Settings.CanDragMove)
             {
                 _mainWindow.DragMove(); 
+            }
+
+            if (e.ClickCount == 2)
+            {
+                // 双击效果
+                StopClockTimer();
+                await Task.Delay(1000);
+                StartWorldLineTimer();
+                await Task.Delay(2000);
+                StartClockTimer();
             }
         }
 
