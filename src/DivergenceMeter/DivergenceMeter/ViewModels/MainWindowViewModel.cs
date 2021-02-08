@@ -11,6 +11,7 @@ using System.Windows.Media.Imaging;
 using DivergenceMeter.Models;
 using Prism.Commands;
 using Prism.Mvvm;
+using PInvoke;
 
 namespace DivergenceMeter.ViewModels
 {
@@ -19,7 +20,7 @@ namespace DivergenceMeter.ViewModels
         // 加载所有图片
         private BitmapImage[] _allImages = new BitmapImage[13];
         private Window _mainWindow = Application.Current.MainWindow;
-
+        private IntPtr _mainWindowHandle = IntPtr.Zero;
         // Settings
         private Settings _settings;
         public Settings Settings
@@ -40,7 +41,7 @@ namespace DivergenceMeter.ViewModels
 
         public MainWindowViewModel()
         {
-            Settings = new Settings() { Opacity = 0.5, CanTopmost = true , CanDragMove = true};
+            Settings = new Settings() { Opacity = 0.5, CanTopmost = true , CanDragMove = true, CanClickThrough = true };
 
             IninialClockImages();
 
@@ -61,6 +62,32 @@ namespace DivergenceMeter.ViewModels
             });
             task.Invoke();
 
+            // 窗体穿透效果 会 阻止 双击 和 窗体拖拽
+
+            // 需要借助 User32.dll 需要获取 Window Handle
+
+        }
+        public void SetTheClickThrough(IntPtr handle)
+        {
+            if (handle == IntPtr.Zero) return;
+            _mainWindowHandle = handle;
+            SetTheClickThrough();
+
+        }
+        private void SetTheClickThrough()
+        {
+            if (_mainWindowHandle == IntPtr.Zero) return;
+            // 函数重载
+            if (Settings.CanClickThrough)
+            {
+                // 设置穿透效果
+                User32.SetWindowLong(_mainWindowHandle, User32.WindowLongIndexFlags.GWL_EXSTYLE, User32.SetWindowLongFlags.WS_EX_TRANSPARENT);
+            }
+            else
+            {
+                // 回复到正常效果
+                User32.SetWindowLong(_mainWindowHandle, User32.WindowLongIndexFlags.GWL_EXSTYLE, User32.SetWindowLongFlags.WS_EX_LAYERED);
+            }
         }
         #region 
         private void StartWorldLineTimer()
