@@ -38,7 +38,8 @@ namespace DivergenceMeter.ViewModels
         private int _currentWorldLineChangedCount;
         // DelegateCommand
         public DelegateCommand<object> DragMoveCommand { get; set; }
-
+        public DelegateCommand OpenSettingsWindowCommand { get; set; }
+        public DelegateCommand ExitTheAppCommand { get; set; }
         public MainWindowViewModel()
         {
             Settings = new Settings() { Opacity = 0.5, CanTopmost = true , CanDragMove = true, CanClickThrough = true };
@@ -46,7 +47,8 @@ namespace DivergenceMeter.ViewModels
             IninialClockImages();
 
             DragMoveCommand = new DelegateCommand<object>(DragMove);
-
+            OpenSettingsWindowCommand = new DelegateCommand(OpenSettingsWindow);
+            ExitTheAppCommand = new DelegateCommand(ExitTheApp);
 
             var task = new Action(async () =>
             {
@@ -67,6 +69,17 @@ namespace DivergenceMeter.ViewModels
             // 需要借助 User32.dll 需要获取 Window Handle
 
         }
+
+        private void ExitTheApp()
+        {
+            Application.Current.Shutdown();
+        }
+
+        private void OpenSettingsWindow()
+        {
+            // 开启设置窗口
+        }
+
         public void SetTheClickThrough(IntPtr handle)
         {
             if (handle == IntPtr.Zero) return;
@@ -216,5 +229,17 @@ namespace DivergenceMeter.ViewModels
             
             return allImages;
         }
+
+
+        public void HiddenWindowTaskbar(IntPtr handle)
+        {
+            // 隐藏任务栏图标 和 Alt + Tab 时的窗口
+
+            int exStyle = User32.GetWindowLong(handle, User32.WindowLongIndexFlags.GWL_EXSTYLE);
+            exStyle = exStyle | (int)User32.SetWindowLongFlags.WS_EX_TOOLWINDOW;
+            User32.SetWindowLong(handle, User32.WindowLongIndexFlags.GWL_EXSTYLE, (User32.SetWindowLongFlags)exStyle);
+
+        }
+
     }
 }

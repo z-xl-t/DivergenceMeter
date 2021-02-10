@@ -37,7 +37,13 @@ namespace DivergenceMeter.Views
             if (window == null) return;
             var handle = new WindowInteropHelper(window).Handle;
 
-            vm.SetTheClickThrough(handle);
+            if (handle != IntPtr.Zero)
+            {
+                vm.SetTheClickThrough(handle);
+
+                vm.HiddenWindowTaskbar(handle);
+
+            }
         }
     }
 }
