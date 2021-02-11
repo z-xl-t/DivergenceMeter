@@ -12,11 +12,14 @@ using DivergenceMeter.Models;
 using Prism.Commands;
 using Prism.Mvvm;
 using PInvoke;
+using Prism.Unity;
+using DivergenceMeter.Views;
 
 namespace DivergenceMeter.ViewModels
 {
     public class MainWindowViewModel: BindableBase
     {
+        private PrismApplication _app;
         // 加载所有图片
         private BitmapImage[] _allImages = new BitmapImage[13];
         private Window _mainWindow = Application.Current.MainWindow;
@@ -40,9 +43,10 @@ namespace DivergenceMeter.ViewModels
         public DelegateCommand<object> DragMoveCommand { get; set; }
         public DelegateCommand OpenSettingsWindowCommand { get; set; }
         public DelegateCommand ExitTheAppCommand { get; set; }
-        public MainWindowViewModel()
+        public MainWindowViewModel(PrismApplication app, Settings settings)
         {
-            Settings = new Settings() { Opacity = 0.5, CanTopmost = true , CanDragMove = true, CanClickThrough = true };
+            _app = app;
+            Settings = settings;
 
             IninialClockImages();
 
@@ -78,6 +82,12 @@ namespace DivergenceMeter.ViewModels
         private void OpenSettingsWindow()
         {
             // 开启设置窗口
+            // 这里可以选择直接创建窗体，绑定 ViewModel， 也能够交由 Prism 托管
+
+            // 选择使用 Prism
+
+            var sw = (SettingsWindow)_app.Container.Resolve(typeof(SettingsWindow));
+            sw.ShowDialog();
         }
 
         public void SetTheClickThrough(IntPtr handle)
