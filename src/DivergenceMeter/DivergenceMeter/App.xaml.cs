@@ -28,7 +28,7 @@ namespace DivergenceMeter
             // 全局单例注入
             // 把 设置 和 prism 都注入进去
             // 稍微改造一些 各种的 Viemodel 
-            containerRegistry.RegisterSingleton<Settings>(() => new Settings());
+            containerRegistry.RegisterSingleton<Settings>(() => SettingsFactory());
             containerRegistry.RegisterSingleton<PrismApplication>(() => this);
 
 
@@ -45,6 +45,15 @@ namespace DivergenceMeter
                 return settings;
             }
             settings = new Settings();
+
+            var width = settings.Width;
+            var height = settings.Height;
+
+            var workAreaWidth = SystemParameters.WorkArea.Width;
+            var workAreaHeight = SystemParameters.WorkArea.Height;
+            settings.Left = workAreaWidth / 2 - width / 2;
+            settings.Top = workAreaHeight / 2 - height / 2;
+
             Settings.SaveSettings(path, settings);
 
             return settings;

@@ -76,6 +76,8 @@ namespace DivergenceMeter.ViewModels
 
         private void ExitTheApp()
         {
+            var path = $@"{AppDomain.CurrentDomain.BaseDirectory}Settings.json";
+            Settings.SaveSettings(path, this.Settings);
             Application.Current.Shutdown();
         }
 

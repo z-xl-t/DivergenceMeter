@@ -9,13 +9,13 @@
         xmlns:prism="http://prismlibrary.com/"
         prism:ViewModelLocator.AutoWireViewModel="True"
         mc:Ignorable="d"
-        WindowStartupLocation="CenterScreen"
         WindowStyle="None"
         ResizeMode="NoResize"
         AllowsTransparency="True"
         Background="Transparent"
         Topmost="{Binding Settings.CanTopmost}"
-        Title="MainWindow" Height="{Binding Settings.Height}" Width="{Binding Settings.Width}">
+        Left="{Binding Settings.Left, Mode=TwoWay}" Top="{Binding Settings.Top, Mode=TwoWay}"
+        Title="MainWindow" Height="{Binding Settings.Height, Mode=TwoWay}" Width="{Binding Settings.Width, Mode=TwoWay}">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="MouseDown">
             <prism:InvokeCommandAction Command="{Binding DragMoveCommand}" TriggerParameterPath=""></prism:InvokeCommandAction>
