@@ -30,6 +30,26 @@ namespace DivergenceMeter
             // 稍微改造一些 各种的 Viemodel 
             containerRegistry.RegisterSingleton<Settings>(() => new Settings());
             containerRegistry.RegisterSingleton<PrismApplication>(() => this);
+
+
+
+        }
+
+        private Settings SettingsFactory()
+        {
+            var path = $@"{AppDomain.CurrentDomain.BaseDirectory}Settings.json";
+            var settings = Settings.LoadSettings(path);
+
+            if (settings != null)
+            {
+                return settings;
+            }
+            settings = new Settings();
+            Settings.SaveSettings(path, settings);
+
+            return settings;
+
+
         }
     }
 }

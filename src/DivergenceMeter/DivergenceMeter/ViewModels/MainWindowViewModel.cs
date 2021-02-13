@@ -87,7 +87,8 @@ namespace DivergenceMeter.ViewModels
             // 选择使用 Prism
 
             var sw = (SettingsWindow)_app.Container.Resolve(typeof(SettingsWindow));
-            sw.ShowDialog();
+            // 应该是 Show
+            sw.Show();
         }
 
         public void SetTheClickThrough(IntPtr handle)

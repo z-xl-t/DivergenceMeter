@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Prism.Mvvm;
 
@@ -44,6 +46,53 @@ namespace DivergenceMeter.Models
             Height = 300;
             Opacity = 1;
             CanDragMove = true;
+        }
+
+        public static bool SaveSettings(string path, Settings settings)
+        {
+            try
+            {
+                var options = new JsonSerializerOptions
+                {
+                    WriteIndented = true
+                };
+
+                var json = JsonSerializer.Serialize(settings, options);
+                File.WriteAllText(path, json);
+
+                return true;
+            }
+            catch(Exception e)
+            {
+                return false;
+            }
+        }
+
+        public static Settings LoadSettings(string path)
+        {
+            if (!File.Exists(path))
+            {
+                return null;
+            }
+
+            try
+            {
+                var jsonString = File.ReadAllText(path);
+
+                var options = new JsonSerializerOptions
+                {
+                    AllowTrailingCommas = true,
+                    ReadCommentHandling = JsonCommentHandling.Skip
+                };
+                var settings = JsonSerializer.Deserialize<Settings>(jsonString, options);
+                return settings;
+
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+
         }
     }
 }
