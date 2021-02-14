@@ -4,11 +4,43 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DivergenceMeter.Views"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:prism="http://prismlibrary.com/"
         prism:ViewModelLocator.AutoWireViewModel="True"
         mc:Ignorable="d"
-        Title="SettingsWindow" Height="450" Width="800">
-    <Grid>
-        <TextBlock>这是设置窗口</TextBlock>
-    </Grid>
+        Icon="/Images/favicon.ico"
+        Title="设置" Height="300" Width="400">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closed">
+            <prism:InvokeCommandAction Command="{Binding SaveSettingsCommand}"></prism:InvokeCommandAction>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <StackPanel Margin="10" HorizontalAlignment="Left">
+        <TextBlock>时钟坐标：</TextBlock>
+        <StackPanel Orientation="Horizontal" Margin="0 10">
+            <TextBox Width="100" Text="{Binding Settings.Left, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+            <TextBox Width="100" Margin="10 0" Text="{Binding Settings.Top, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+        </StackPanel>
+        <TextBlock>时钟宽高：</TextBlock>
+        <StackPanel Orientation="Horizontal" Margin="0 10">
+            <TextBox Width="100" Text="{Binding Settings.Width, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+            <TextBox Width="100" Margin="10 0" Text="{Binding Settings.Height, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+            <CheckBox IsChecked="{Binding Settings.CanLockRadio, UpdateSourceTrigger=PropertyChanged}" Content="锁定宽高比"></CheckBox>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0 10">
+            <TextBlock>不透明度：</TextBlock>
+            <TextBox Width="30" Margin="10 0" Text="{Binding Settings.Opacity, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+            <TextBlock>范围 [0, 1]</TextBlock>
+        </StackPanel>
+        <StackPanel Margin="0 10" Orientation="Horizontal">
+            <CheckBox IsChecked="{Binding Settings.CanDragMove, UpdateSourceTrigger=PropertyChanged}" Content="允许拖动"></CheckBox>
+            <CheckBox Margin="40 0" IsChecked="{Binding Settings.CanTopmost, UpdateSourceTrigger=PropertyChanged}" Content="时钟置顶"></CheckBox>
+            <CheckBox IsChecked="{Binding Settings.CanClickThrough, UpdateSourceTrigger=PropertyChanged}" Content="点击穿透"></CheckBox>
+        </StackPanel>
+        <StackPanel Margin="0 10">
+            <TextBlock>说明：</TextBlock>
+            <TextBlock>坐标和宽高单位基于 WPF 单位</TextBlock>
+            <TextBlock>点击穿透效果会阻止拖动和双击效果</TextBlock>
+        </StackPanel>
+    </StackPanel>
 </Window>

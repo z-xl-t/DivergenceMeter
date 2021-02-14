@@ -19,6 +19,8 @@ namespace DivergenceMeter
     {
         protected override Window CreateShell()
         {
+            // 在 .NET 4.5 以上， TextBox 无法输入 浮动数 需要做如下修改
+            FrameworkCompatibilityPreferences.KeepTextBoxDisplaySynchronizedWithTextProperty = false;
             var w = Container.Resolve<MainWindow>();
             return w;
         }

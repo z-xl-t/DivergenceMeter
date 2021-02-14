@@ -48,6 +48,9 @@ namespace DivergenceMeter.ViewModels
             _app = app;
             Settings = settings;
 
+            Settings.CanClickThroughChangedEvent += SetTheClickThrough;
+
+
             IninialClockImages();
 
             DragMoveCommand = new DelegateCommand<object>(DragMove);
@@ -97,14 +100,14 @@ namespace DivergenceMeter.ViewModels
         {
             if (handle == IntPtr.Zero) return;
             _mainWindowHandle = handle;
-            SetTheClickThrough();
+            SetTheClickThrough(Settings.CanClickThrough);
 
         }
-        private void SetTheClickThrough()
+        private void SetTheClickThrough(bool canClickThrough)
         {
             if (_mainWindowHandle == IntPtr.Zero) return;
             // 函数重载
-            if (Settings.CanClickThrough)
+            if (canClickThrough)
             {
                 // 设置穿透效果
                 User32.SetWindowLong(_mainWindowHandle, User32.WindowLongIndexFlags.GWL_EXSTYLE, User32.SetWindowLongFlags.WS_EX_TRANSPARENT);
