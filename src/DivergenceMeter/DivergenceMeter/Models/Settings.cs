@@ -87,6 +87,7 @@ namespace DivergenceMeter.Models
         }
         // 无需与 xmal 元素关联
         public bool CanDragMove { get; set; }
+        public bool CanAttachEdge { get; set; }
         // CanClickThrough 需要一个事件
         public event Action<bool> CanClickThroughChangedEvent;
         private bool _canClickThrough;
@@ -107,6 +108,7 @@ namespace DivergenceMeter.Models
             Opacity = 1;
             CanDragMove = true;
             CanTopmost = true;
+            CanAttachEdge = true;
         }
 
         private void OnWidthChanged(double width)

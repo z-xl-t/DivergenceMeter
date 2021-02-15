@@ -222,6 +222,29 @@ namespace DivergenceMeter.ViewModels
             if (e != null && e.LeftButton == MouseButtonState.Pressed && Settings.CanDragMove)
             {
                 _mainWindow.DragMove(); 
+
+                if (Settings.CanAttachEdge)
+                {
+                    var workArea = SystemParameters.WorkArea;
+                    if (Settings.Left - 10 < 0)
+                    {
+                        Settings.Left = 0;
+                    }
+                    else if (Settings.Left + Settings.Width - 10 > workArea.Width)
+                    {
+                        Settings.Left = workArea.Width - Settings.Width;
+                    }
+
+                    if (Settings.Top - 10 < 0)
+                    {
+                        Settings.Top = 0;
+                    }
+                    else if(Settings.Top + Settings.Height - 10 > workArea.Height)
+                    {
+                        Settings.Top = workArea.Height - Settings.Height;
+                    }
+                }
+
             }
 
             if (e.ClickCount == 2)
