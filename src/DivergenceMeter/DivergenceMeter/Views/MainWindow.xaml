@@ -13,6 +13,7 @@
         ResizeMode="NoResize"
         AllowsTransparency="True"
         Background="Transparent"
+        ShowInTaskbar="False"
         Topmost="{Binding Settings.CanTopmost}"
         Left="{Binding Settings.Left, Mode=TwoWay}" Top="{Binding Settings.Top, Mode=TwoWay}"
         Title="MainWindow" Height="{Binding Settings.Height, Mode=TwoWay}" Width="{Binding Settings.Width, Mode=TwoWay}">
