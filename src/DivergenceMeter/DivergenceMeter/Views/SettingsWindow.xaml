@@ -46,6 +46,7 @@
             <TextBlock>说明：</TextBlock>
             <TextBlock>坐标和宽高单位基于 WPF 单位</TextBlock>
             <TextBlock>点击穿透效果会阻止拖动和双击效果</TextBlock>
+            <TextBlock>边缘吸附效果只针对主屏幕（如果存在多屏）</TextBlock>
         </StackPanel>
     </StackPanel>
 </Window>
