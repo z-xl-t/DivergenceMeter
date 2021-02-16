@@ -14,6 +14,8 @@ using Prism.Mvvm;
 using PInvoke;
 using Prism.Unity;
 using DivergenceMeter.Views;
+using System.Diagnostics;
+using System.IO;
 
 namespace DivergenceMeter.ViewModels
 {
@@ -49,7 +51,7 @@ namespace DivergenceMeter.ViewModels
             Settings = settings;
 
             Settings.CanClickThroughChangedEvent += SetTheClickThrough;
-
+            Settings.CanStartupChangedEvent += SetStartup;
 
             IninialClockImages();
 
@@ -76,6 +78,45 @@ namespace DivergenceMeter.ViewModels
             // 需要借助 User32.dll 需要获取 Window Handle
 
         }
+
+        public void SetStartup()
+        {
+            SetStartup(Settings.CanStartup);
+        }
+        private void SetStartup(bool canStartup)
+        {
+            string startupPath = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
+            var appPath = Process.GetCurrentProcess().MainModule.FileName;
+            var workPath = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
+
+            var shortcutName = System.IO.Path.GetFileNameWithoutExtension(appPath);
+
+            var linkPath = $@"{startupPath}\{shortcutName}.lnk";
+
+            if (canStartup)
+            {
+                if (!File.Exists(linkPath))
+                {
+                    var shellType = Type.GetTypeFromProgID("WScript.shell");
+                    dynamic shell = Activator.CreateInstance(shellType);
+                    var shortcut = shell.CreateShortcut(linkPath);
+                    shortcut.TargetPath = appPath;
+                    shortcut.WorkingDirectory = workPath;
+                    shortcut.Save();
+
+                }
+            }
+
+            else
+            {
+                if (File.Exists(linkPath))
+                {
+                    File.Delete(linkPath);
+                }
+            }
+
+        }
+
 
         private void ExitTheApp()
         {

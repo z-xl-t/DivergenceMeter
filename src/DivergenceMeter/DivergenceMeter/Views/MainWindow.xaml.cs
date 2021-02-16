@@ -44,6 +44,9 @@ namespace DivergenceMeter.Views
                 vm.HiddenWindowTaskbar(handle);
 
             }
+
+            // 开启启动实现：往开机启动文件夹里写入快捷方式（无需管理员权限）
+            vm.SetStartup();
         }
     }
 }

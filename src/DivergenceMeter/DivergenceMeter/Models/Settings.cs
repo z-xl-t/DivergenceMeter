@@ -100,6 +100,18 @@ namespace DivergenceMeter.Models
                 CanClickThroughChangedEvent?.Invoke(value);
             }
         }
+        public event Action<bool> CanStartupChangedEvent;
+        private bool _canStartup;
+        public bool CanStartup
+        {
+            get => _canStartup;
+            set
+            {
+                SetProperty(ref _canStartup, value);
+                CanStartupChangedEvent?.Invoke(value);
+            }
+        }
+
         public Settings()
         {
             // 八张图片，一张图片宽高比为 1：3，最终为 8：3
