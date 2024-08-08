@@ -1,6 +1,6 @@
 ## 命运石之门时钟挂件
 
-使用 .NET 5、WPF 和 Prism 8 制作的桌面时钟挂件
+使用 .NET 6、WPF 和 Prism 8 制作的桌面时钟挂件
 
 
 ### 实现功能
@@ -25,7 +25,7 @@
 * 前往 [DivergenceMeter](https://github.com/sanshiliuxiao/DivergenceMeter/releases) 下载 exe 文件
 
 
-* 如果电脑上不存在 .NET 5 环境，需要前往微软官网下载。 [Download .NET5](https://dotnet.microsoft.com/download)
+* 如果电脑上不存在 .NET 6 环境，需要前往微软官网下载。 [Download .NET6](https://dotnet.microsoft.com/download)
 
 ## 文档
 
