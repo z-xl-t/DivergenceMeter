@@ -1,16 +1,14 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
+using System.Windows;
 using Prism.Mvvm;
 
 namespace DivergenceMeter.Models
 {
     public class Settings: BindableBase
     {
+        public static string Default_File_Path = $@"{AppDomain.CurrentDomain.BaseDirectory}Settings.json";
         // 优化 Settings 类
         private double _radio = 8.0 / 3;
         private bool _canLockRadio;
@@ -111,6 +109,13 @@ namespace DivergenceMeter.Models
                 CanStartupChangedEvent?.Invoke(value);
             }
         }
+        private string _password;
+        public string Password { 
+            get => _password;
+            set { 
+                SetProperty(ref _password, value);
+            } 
+        }
 
         public Settings()
         {
@@ -121,6 +126,7 @@ namespace DivergenceMeter.Models
             CanDragMove = true;
             CanTopmost = true;
             CanAttachEdge = true;
+            Password = "123456789";
         }
 
         private void OnWidthChanged(double width)
@@ -142,22 +148,15 @@ namespace DivergenceMeter.Models
 
         public static bool SaveSettings(string path, Settings settings)
         {
-            try
+            var options = new JsonSerializerOptions
             {
-                var options = new JsonSerializerOptions
-                {
-                    WriteIndented = true
-                };
+                WriteIndented = true
+            };
 
-                var json = JsonSerializer.Serialize(settings, options);
-                File.WriteAllText(path, json);
+            var json = JsonSerializer.Serialize(settings, options);
+            File.WriteAllText(path, json);
 
-                return true;
-            }
-            catch(Exception e)
-            {
-                return false;
-            }
+            return true;
         }
 
         public static Settings LoadSettings(string path)
@@ -166,24 +165,41 @@ namespace DivergenceMeter.Models
             {
                 return null;
             }
+            var jsonString = File.ReadAllText(path);
 
-            try
+            var options = new JsonSerializerOptions
             {
-                var jsonString = File.ReadAllText(path);
+                AllowTrailingCommas = true,
+                ReadCommentHandling = JsonCommentHandling.Skip
+            };
+            var settings = JsonSerializer.Deserialize<Settings>(jsonString, options);
+            return settings;
 
-                var options = new JsonSerializerOptions
-                {
-                    AllowTrailingCommas = true,
-                    ReadCommentHandling = JsonCommentHandling.Skip
-                };
-                var settings = JsonSerializer.Deserialize<Settings>(jsonString, options);
+
+        }
+
+        public static Settings SettingsFactory()
+        {
+            var settings = Settings.LoadSettings(Default_File_Path);
+
+            if (settings != null)
+            {
                 return settings;
+            }
+            settings = new Settings();
 
-            }
-            catch (Exception e)
-            {
-                return null;
-            }
+            var width = settings.Width;
+            var height = settings.Height;
+
+            var workAreaWidth = SystemParameters.WorkArea.Width;
+            var workAreaHeight = SystemParameters.WorkArea.Height;
+            settings.Left = workAreaWidth / 2 - width / 2;
+            settings.Top = workAreaHeight / 2 - height / 2;
+
+            Settings.SaveSettings(Default_File_Path, settings);
+
+            return settings;
+
 
         }
     }

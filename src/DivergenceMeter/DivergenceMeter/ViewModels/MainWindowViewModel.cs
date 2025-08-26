@@ -1,162 +1,133 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media.Imaging;
+using DivergenceMeter.Helpers;
 using DivergenceMeter.Models;
-using Prism.Commands;
-using Prism.Mvvm;
-using PInvoke;
-using Prism.Unity;
 using DivergenceMeter.Views;
-using System.Diagnostics;
-using System.IO;
+using PInvoke;
+using Prism.Commands;
+using Prism.Ioc;
+using Prism.Mvvm;
+using Prism.Unity;
 
 namespace DivergenceMeter.ViewModels
 {
+
+    // 窗体穿透效果 会 阻止双击和窗体拖拽
+    // 需要借助 User32.dll 需要获取 Window Handle
     public class MainWindowViewModel: BindableBase
     {
-        private PrismApplication _app;
-        // 加载所有图片
+        private readonly IContainerExtension _container;
+        private readonly Helper _helper;
+        private readonly SettingsWindow _sw;
+        private readonly ScreenLockWindow _slw;
+        private readonly VerifyPasswordWindow _vpw;
         private BitmapImage[] _allImages = new BitmapImage[13];
-        private Window _mainWindow = Application.Current.MainWindow;
-        private IntPtr _mainWindowHandle = IntPtr.Zero;
-        // Settings
+        private Window _mainWindow;
         private Settings _settings;
         public Settings Settings
         {
             get => _settings;
             set => SetProperty(ref _settings, value);
         }
-        // 动态时钟
-        // 与 xaml 关联的图片
         public ObservableCollection<BitmapImage> ClockImages { get; set; } = new ObservableCollection<BitmapImage>();
         private int[] _clockImagesIndex = new int[8];
         private Timer _clockTimer;
         private Timer _worldLineTimer;
         private int _maxWorldLineChangedCount = 50;
         private int _currentWorldLineChangedCount;
-        // DelegateCommand
+        private bool _lockWorldLine = false;
+
         public DelegateCommand<object> DragMoveCommand { get; set; }
         public DelegateCommand OpenSettingsWindowCommand { get; set; }
+        public DelegateCommand LockWindowCommand { get; set; }
         public DelegateCommand ExitTheAppCommand { get; set; }
-        public MainWindowViewModel(PrismApplication app, Settings settings)
+        public MainWindowViewModel(IContainerExtension container)
         {
-            _app = app;
-            Settings = settings;
+            _container = container;
+            Settings = _container.Resolve<Settings>();
+            _helper = _container.Resolve<Helper>();
+
+            _sw = _container.Resolve<SettingsWindow>();
+            _slw = _container.Resolve<ScreenLockWindow>();
+            _vpw = _container.Resolve<VerifyPasswordWindow>();
+            var slw_vm = _slw.DataContext as ScreenLockWindowViewModel;
+            var vpw_vm = _vpw.DataContext as VerifyPasswordWindowViewModel;
+            slw_vm.SetScreenLockAndVerifyPasswordWindowInSLW(_slw, _vpw);
+            vpw_vm.SetScreenLockAndVerifyPasswordWindowInVPW(_slw, _vpw);
 
             Settings.CanClickThroughChangedEvent += SetTheClickThrough;
-            Settings.CanStartupChangedEvent += SetStartup;
-
-            IninialClockImages();
-
+            Settings.CanStartupChangedEvent += Helper.StartUpTheApp;
             DragMoveCommand = new DelegateCommand<object>(DragMove);
             OpenSettingsWindowCommand = new DelegateCommand(OpenSettingsWindow);
+            LockWindowCommand = new DelegateCommand(LockWindow);
             ExitTheAppCommand = new DelegateCommand(ExitTheApp);
-
+        }
+        public void CreateWindowAndVMAfter(Window window)
+        {
+            _mainWindow = window;
+            IninialClockImages();
             var task = new Action(async () =>
             {
-                // 时钟效果
                 InitialClockTimer();
-
-                // 世界线效果
                 InitialWorldLineTimer();
-
                 StartWorldLineTimer();
                 await Task.Delay(1000);
                 StartClockTimer();
             });
             task.Invoke();
+            SetTheClickThrough();
+            HiddenWindowTaskbar();
+            SetStartup();
+        }
 
-            // 窗体穿透效果 会 阻止 双击 和 窗体拖拽
-
-            // 需要借助 User32.dll 需要获取 Window Handle
-
+        private void LockWindow()
+        {
+            var slw_vm = _slw.DataContext as ScreenLockWindowViewModel;
+            slw_vm.Start();
         }
 
         public void SetStartup()
         {
-            SetStartup(Settings.CanStartup);
+            Helper.StartUpTheApp(Settings.CanStartup);
         }
-        private void SetStartup(bool canStartup)
-        {
-            string startupPath = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
-            var appPath = Process.GetCurrentProcess().MainModule.FileName;
-            var workPath = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
-
-            var shortcutName = System.IO.Path.GetFileNameWithoutExtension(appPath);
-
-            var linkPath = $@"{startupPath}\{shortcutName}.lnk";
-
-            if (canStartup)
-            {
-                if (!File.Exists(linkPath))
-                {
-                    var shellType = Type.GetTypeFromProgID("WScript.shell");
-                    dynamic shell = Activator.CreateInstance(shellType);
-                    var shortcut = shell.CreateShortcut(linkPath);
-                    shortcut.TargetPath = appPath;
-                    shortcut.WorkingDirectory = workPath;
-                    shortcut.Save();
-
-                }
-            }
-
-            else
-            {
-                if (File.Exists(linkPath))
-                {
-                    File.Delete(linkPath);
-                }
-            }
-
-        }
-
 
         private void ExitTheApp()
         {
             var path = $@"{AppDomain.CurrentDomain.BaseDirectory}Settings.json";
-            Settings.SaveSettings(path, this.Settings);
+            Settings.SaveSettings(path, Settings);
             Application.Current.Shutdown();
         }
 
         private void OpenSettingsWindow()
         {
-            // 开启设置窗口
-            // 这里可以选择直接创建窗体，绑定 ViewModel， 也能够交由 Prism 托管
-
-            // 选择使用 Prism
-
-            var sw = (SettingsWindow)_app.Container.Resolve(typeof(SettingsWindow));
-            // 应该是 Show
-            sw.Show();
+            _sw.Show();
         }
 
-        public void SetTheClickThrough(IntPtr handle)
+        public void SetTheClickThrough()
         {
-            if (handle == IntPtr.Zero) return;
-            _mainWindowHandle = handle;
             SetTheClickThrough(Settings.CanClickThrough);
 
         }
         private void SetTheClickThrough(bool canClickThrough)
         {
-            if (_mainWindowHandle == IntPtr.Zero) return;
-            // 函数重载
             if (canClickThrough)
             {
-                // 设置穿透效果
-                User32.SetWindowLong(_mainWindowHandle, User32.WindowLongIndexFlags.GWL_EXSTYLE, User32.SetWindowLongFlags.WS_EX_TRANSPARENT);
+                _helper.ClickThrough(_mainWindow);
             }
             else
             {
-                // 回复到正常效果
-                User32.SetWindowLong(_mainWindowHandle, User32.WindowLongIndexFlags.GWL_EXSTYLE, User32.SetWindowLongFlags.WS_EX_LAYERED);
+               _helper.UnClickThrough(_mainWindow);
             }
         }
         #region 
@@ -170,11 +141,13 @@ namespace DivergenceMeter.ViewModels
         }
         private void TheWorldLine(object sender, ElapsedEventArgs e)
         {
+
             if (_currentWorldLineChangedCount > _maxWorldLineChangedCount && (_clockImagesIndex[0] == 0 || _clockImagesIndex[0] == 1))
             {
                 // stop and reset
                 StopWorldLineTimer();
                 _currentWorldLineChangedCount = 0;
+                _lockWorldLine = false;
                 return;
 
             }
@@ -247,7 +220,10 @@ namespace DivergenceMeter.ViewModels
         #endregion
         private void IninialClockImages()
         {
-            _allImages = LoadAllImage();
+            for (var i = 0; i < _allImages.Length; ++i)
+            {
+                _allImages[i] = new BitmapImage(new Uri($"/Images/{i}.png", UriKind.Relative));
+            }
             var clockImages = new BitmapImage[8];
             for(int i=0; i<_clockImagesIndex.Length; ++i)
             {
@@ -291,6 +267,14 @@ namespace DivergenceMeter.ViewModels
             if (e.ClickCount == 2)
             {
                 // 双击效果
+
+                if (_lockWorldLine == true)
+                {
+                    return;
+                } else
+                {
+                    _lockWorldLine = true;
+                }
                 StopClockTimer();
                 await Task.Delay(1000);
                 StartWorldLineTimer();
@@ -298,28 +282,9 @@ namespace DivergenceMeter.ViewModels
                 StartClockTimer();
             }
         }
-
-        private BitmapImage[] LoadAllImage()
+        public void HiddenWindowTaskbar()
         {
-            var allImages = new BitmapImage[13];
-            for(var i=0; i<allImages.Length; ++i)
-            {
-                allImages[i] = new BitmapImage(new Uri($"/Images/{i}.png", UriKind.Relative));
-            }
-            
-            return allImages;
+            _helper.HiddenWindowTaskbar(_mainWindow);
         }
-
-
-        public void HiddenWindowTaskbar(IntPtr handle)
-        {
-            // 隐藏任务栏图标 和 Alt + Tab 时的窗口
-
-            int exStyle = User32.GetWindowLong(handle, User32.WindowLongIndexFlags.GWL_EXSTYLE);
-            exStyle = exStyle | (int)User32.SetWindowLongFlags.WS_EX_TOOLWINDOW;
-            User32.SetWindowLong(handle, User32.WindowLongIndexFlags.GWL_EXSTYLE, (User32.SetWindowLongFlags)exStyle);
-
-        }
-
     }
 }

@@ -46,6 +46,7 @@
             <tb:TaskbarIcon.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="设置" Command="{Binding OpenSettingsWindowCommand}"/>
+                    <MenuItem Header="锁屏" Command="{Binding LockWindowCommand}"/>
                     <MenuItem Header="退出" Command="{Binding ExitTheAppCommand}"/>
                 </ContextMenu>
             </tb:TaskbarIcon.ContextMenu>
