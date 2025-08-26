@@ -1,16 +1,9 @@
+using System.Windows;
+using DivergenceMeter.Helpers;
+using DivergenceMeter.Models;
 using Prism.Commands;
 using Prism.Ioc;
 using Prism.Mvvm;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using DivergenceMeter.Helpers;
-using DivergenceMeter.Views;
-using DivergenceMeter.Models;
-using DivergenceMeter.ViewModels;
 
 namespace DivergenceMeter.ViewModels
 {

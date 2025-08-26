@@ -13,7 +13,7 @@
         ResizeMode="NoResize"
         AllowsTransparency="True"
         Background="White"
-        Opacity="0.8"
+        Opacity="0.01"
         ShowInTaskbar="False">
     <Grid>
         <Button Command="{Binding OpenPasswordWindowCommand}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="White" Opacity="0.01"></Button>

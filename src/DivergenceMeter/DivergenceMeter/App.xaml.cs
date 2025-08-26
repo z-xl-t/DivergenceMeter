@@ -25,9 +25,7 @@ namespace DivergenceMeter
         {
             // 全局单例注入
             containerRegistry.RegisterSingleton<Settings>(() => Settings.SettingsFactory());
-            containerRegistry.RegisterSingleton<PrismApplication>(() => this);
             containerRegistry.RegisterSingleton<Helper>(() => new Helper());
-            containerRegistry.RegisterSingleton<ScreenLockWindow>(() => new ScreenLockWindow());
         }
     }
 }

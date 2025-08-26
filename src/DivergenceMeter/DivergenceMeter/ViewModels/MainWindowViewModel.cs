@@ -1,24 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using DivergenceMeter.Helpers;
 using DivergenceMeter.Models;
 using DivergenceMeter.Views;
-using PInvoke;
 using Prism.Commands;
 using Prism.Ioc;
 using Prism.Mvvm;
-using Prism.Unity;
 
 namespace DivergenceMeter.ViewModels
 {
@@ -54,6 +47,18 @@ namespace DivergenceMeter.ViewModels
         public DelegateCommand ExitTheAppCommand { get; set; }
         public MainWindowViewModel(IContainerExtension container)
         {
+            for (var i = 0; i < _allImages.Length; ++i)
+            {
+                _allImages[i] = new BitmapImage(new Uri($"/Images/{i}.png", UriKind.Relative));
+
+            }
+            var clockImages = new BitmapImage[8];
+            for (int i = 0; i < _clockImagesIndex.Length; ++i)
+            {
+                _clockImagesIndex[i] = 0;
+                clockImages[i] = _allImages[_clockImagesIndex[i]];
+            }
+            ClockImages.AddRange(clockImages);
             _container = container;
             Settings = _container.Resolve<Settings>();
             _helper = _container.Resolve<Helper>();
@@ -76,7 +81,6 @@ namespace DivergenceMeter.ViewModels
         public void CreateWindowAndVMAfter(Window window)
         {
             _mainWindow = window;
-            IninialClockImages();
             var task = new Action(async () =>
             {
                 InitialClockTimer();
@@ -218,20 +222,7 @@ namespace DivergenceMeter.ViewModels
             }
         }
         #endregion
-        private void IninialClockImages()
-        {
-            for (var i = 0; i < _allImages.Length; ++i)
-            {
-                _allImages[i] = new BitmapImage(new Uri($"/Images/{i}.png", UriKind.Relative));
-            }
-            var clockImages = new BitmapImage[8];
-            for(int i=0; i<_clockImagesIndex.Length; ++i)
-            {
-                _clockImagesIndex[i] = 0;
-                clockImages[i] = _allImages[_clockImagesIndex[i]];
-            }
-            ClockImages.AddRange(clockImages);
-        }
+
 
         private async void DragMove(object obj)
         {

@@ -1,6 +1,4 @@
-using System;
 using DivergenceMeter.Models;
-using Prism.Commands;
 using Prism.Mvvm;
 
 namespace DivergenceMeter.ViewModels

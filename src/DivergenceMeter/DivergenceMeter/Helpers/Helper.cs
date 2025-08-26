@@ -1,12 +1,9 @@
-using PInvoke;
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Text.Encodings.Web;
-using System.Text.Json;
-using System.Text.Unicode;
 using System.Windows;
 using System.Windows.Interop;
+using PInvoke;
 
 namespace DivergenceMeter.Helpers
 {
